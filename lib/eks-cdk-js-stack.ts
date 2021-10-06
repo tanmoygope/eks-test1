@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Vpc, IVpc, InstanceType, Port, BlockDeviceVolume, EbsDeviceVolumeType, Instance, MachineImage, AmazonLinuxGeneration, SecurityGroup, Peer } from '@aws-cdk/aws-ec2';
 import { AwsAuth, Cluster, EndpointAccess, KubernetesVersion, KubernetesManifest, CfnAddon } from '@aws-cdk/aws-eks';
-import { PolicyStatement, Effect, Role, ManagedPolicy, ServicePrincipal, OpenIdConnectPrincipal } from '@aws-cdk/aws-iam';
+import { PolicyStatement, Effect, User, Role, ManagedPolicy, ServicePrincipal, OpenIdConnectPrincipal } from '@aws-cdk/aws-iam';
 import { Key } from '@aws-cdk/aws-kms';
 import { Runtime, SingletonFunction, Code } from '@aws-cdk/aws-lambda';
 import { RetentionDays } from '@aws-cdk/aws-logs';
@@ -171,12 +171,11 @@ export class Ekstack extends cdk.Stack {
       addonVersion: this.node.tryGetContext('eks-addon-coredns-version'),
     }))();
 
-    // Add existing IAM Role to Custom Group
-    // https://aws.github.io/aws-eks-best-practices/security/docs/iam/#use-iam-roles-when-multiple-users-need-identical-access-to-the-cluster
-    // this.awsauth.addRoleMapping(Role.fromRoleArn(this, 'Role_Admin', `arn:aws:iam::${this.account}:role/Admin`), {
-    //   groups: ['eks-console-dashboard-full-access-group'],
-    //   username: `arn:aws:iam::${this.account}:role/Admin/{{SessionName}}`,
-    // });
+    // Add existing IAM User to Custom Group
+    this.awsauth.addUserMapping(User.fromUserArn(this, 'Role_Admin', `arn:aws:iam::${this.account}:user/Tanmoy`), {
+      groups: ['eks-console-dashboard-full-access-group'],
+      username: `arn:aws:iam::${this.account}:user/Tanmoy`,
+    });
 
     // Enable EKS Cluster Logging using Custom Resources
     // https://github.com/aws/aws-cdk/issues/4159
@@ -268,6 +267,6 @@ export class Ekstack extends cdk.Stack {
     if (stack.node.tryGetContext('cluster_name') !== undefined) {
       return stack.node.tryGetContext('cluster_name');
     }
-    return 'myekscluster';
+    return 'casekscluster';
   }
 }

@@ -20,7 +20,7 @@ export class K8sBaselineStack extends cdk.Stack {
     // ============================================================================================================================================
     const ebsDriver = new CfnParameter(this, 'ebsDriver', {
       type: 'String',
-      default: 'false',
+      default: 'true',
       description: 'Deploy EBS CSI Driver',
       allowedValues: ['true', 'false'],
     });
@@ -32,7 +32,7 @@ export class K8sBaselineStack extends cdk.Stack {
     });
     const efsDriver = new CfnParameter(this, 'efsDriver', {
       type: 'String',
-      default: 'false',
+      default: 'true',
       description: 'Deploy EFS CSI Driver',
       allowedValues: ['true', 'false'],
     });
@@ -46,14 +46,14 @@ export class K8sBaselineStack extends cdk.Stack {
     });
     const secretsDriver = new CfnParameter(this, 'secretsDriver', {
       type: 'String',
-      default: 'false',
+      default: 'true',
       description: 'Deploy AWS Secrets CSI Driver',
       allowedValues: ['true', 'false'],
     });
 
     const networkPolicyEngineDriver = new CfnParameter(this, 'networkPolicyEngine', {
       type: 'String',
-      default: 'false',
+      default: 'true',
       description: 'Deploy Calico Network Policy Engine Driver',
       allowedValues: ['true', 'false'],
     });
@@ -66,7 +66,7 @@ export class K8sBaselineStack extends cdk.Stack {
     });
     const containerInsightsDriver = new CfnParameter(this, 'containerInsights', {
       type: 'String',
-      default: 'false',
+      default: 'true',
       description: 'Deploy Container Insights',
       allowedValues: ['true', 'false'],
     });

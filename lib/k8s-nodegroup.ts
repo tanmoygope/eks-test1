@@ -35,7 +35,7 @@ export class K8snodegroups extends cdk.Stack {
     });
     const nodeAMIVersion = new CfnParameter(this, 'nodeAMIVersion', {
       type: 'String',
-      default: '1.21.2-20210722',
+      default: '1.21.2-20211004',
       description: 'AMI version used for EKS Worker nodes https://docs.aws.amazon.com/eks/latest/userguide/eks-linux-ami-versions.html',
     });
 
