@@ -14,7 +14,7 @@
     "@aws-cdk/aws-efs:defaultEncryptionAtRest": true,
     "@aws-cdk/aws-lambda:recognizeVersionProps": true,
     "@aws-cdk/core:newStyleStackSynthesis": true,
-    "eks-addon-vpc-cni-version": "v1.9.1-eksbuild.2",
+    "eks-addon-vpc-cni-version": "v1.7.5-eksbuild.2",
     "eks-addon-kube-proxy-version": "v1.21.2-eksbuild.2",
     "eks-addon-coredns-version": "v1.8.4-eksbuild.1",
     "cluster-autoscaler-helm-version": "9.10.3",
