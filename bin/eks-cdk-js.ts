@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import * as cdk from '@aws-cdk/core';
+import 'source-map-support/register';
 import { Ekstack } from '../lib/eks-cdk-js-stack';
-
+import { PipelineStack } from '../lib/eks-cdk-js-stack';
 import { K8sBaselineStack } from '../lib/k8s-baseline';
 import { K8snodegroups } from '../lib/k8s-nodegroup';
 
@@ -31,6 +32,11 @@ const k8sbase = new K8sBaselineStack(app, 'EKSK8sBaseline', ({
   stackName: `${prefix}EKSK8sBaseline`,
   eksCluster: eks.cluster,
 
+}));
+
+const pipeline = new PipelineStack(app, 'EKSpipeline', ({
+  env: DEFAULT_CONFIG.env,
+  stackName: `${prefix}pipeline`,
 }));
 
 k8sbase.addDependency(nodegroups);

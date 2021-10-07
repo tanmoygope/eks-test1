@@ -11,6 +11,12 @@ import * as cdk from '@aws-cdk/core';
 import { Provider } from '@aws-cdk/custom-resources';
 import * as yaml from 'js-yaml';
 import { eksVpc, addEndpoint } from '../lib/vpc-stack';
+import s3 = require('@aws-cdk/aws-s3');
+import codecommit = require('@aws-cdk/aws-codecommit');
+import codepipeline = require('@aws-cdk/aws-codepipeline');
+import codepipeline_actions = require('@aws-cdk/aws-codepipeline-actions');
+import codebuild = require('@aws-cdk/aws-codebuild');
+import ecr = require('@aws-cdk/aws-ecr');
 
 interface ekstackprops extends cdk.StackProps {
 }
@@ -268,5 +274,110 @@ export class Ekstack extends cdk.Stack {
       return stack.node.tryGetContext('cluster_name');
     }
     return 'casekscluster';
+  }
+}
+
+export class PipelineStack extends cdk.Stack {
+  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+    super(scope, id, props);
+
+    // *******************************************
+    // * Stage 0 ; CodeArtifact 
+    // *******************************************
+
+    // The code that defines your stack goes here
+    const artifactsBucket = new s3.Bucket(this, "ArtifactsBucket");
+
+    // Test ECR creation, Have not figured out new sample codes where ECR could be used.
+    const ecrRepo = new ecr.Repository(this, 'CasEcrRepo');
+
+    // The source code of the app needs to be uploaded to this repo, after code add the pipeline will start automatically.
+    // a) clone cas-repo b) commit code c) pipeline runs automatically d) test the api link
+    const repository = new codecommit.Repository(this, 'CodeCommitRepo', {
+      repositoryName: `cas-app`
+    });
+
+    // *******************************************
+    // * Stage 1 ; CodeCommit 
+    // *******************************************
+
+    const codeRepo = codecommit.Repository.fromRepositoryName(
+      this,
+      'AppRepository', // Logical name within CloudFormation
+      'cas-app' // Repository name
+    );
+
+    // Pipeline creation starts
+    const pipeline = new codepipeline.Pipeline(this, 'Pipeline', {
+      artifactBucket: artifactsBucket
+    });
+
+    // Declare source code as an artifact
+    const sourceOutput = new codepipeline.Artifact();
+
+    // Add source stage to pipeline
+    pipeline.addStage({
+      stageName: 'Source',
+      actions: [
+        new codepipeline_actions.CodeCommitSourceAction({
+          actionName: 'CodeCommit_Source',
+          repository: codeRepo,
+          output: sourceOutput,
+        }),
+      ],
+    });
+
+    // *******************************************
+    // * Stage 2 ; CodeBuild 
+    // *******************************************
+
+    const buildOutput = new codepipeline.Artifact();
+
+    // Declare a new CodeBuild project
+    const buildProject = new codebuild.PipelineProject(this, 'Build', {
+      environment: { buildImage: codebuild.LinuxBuildImage.AMAZON_LINUX_2_2 },
+      environmentVariables: {
+        'PACKAGE_BUCKET': {
+          value: artifactsBucket.bucketName
+        }
+      }
+    });
+
+    // Add the build stage to our pipeline
+    pipeline.addStage({
+      stageName: 'Build',
+      actions: [
+        new codepipeline_actions.CodeBuildAction({
+          actionName: 'Build',
+          project: buildProject,
+          input: sourceOutput,
+          outputs: [buildOutput],
+        }),
+      ],
+    });
+
+    // *******************************************
+    // * Stage 3 ; CodeDeploy 
+    // *******************************************
+
+    pipeline.addStage({
+      stageName: 'Dev',
+      actions: [
+        new codepipeline_actions.CloudFormationCreateReplaceChangeSetAction({
+          actionName: 'CreateChangeSet',
+          templatePath: buildOutput.atPath("packaged.yaml"),
+          stackName: 'cas-app',
+          adminPermissions: true,
+          changeSetName: 'cas-app-dev-changeset',
+          runOrder: 1
+        }),
+        new codepipeline_actions.CloudFormationExecuteChangeSetAction({
+          actionName: 'Deploy',
+          stackName: 'cas-app',
+          changeSetName: 'cas-app-dev-changeset',
+          runOrder: 2
+        }),
+      ],
+    });
   }
 }
