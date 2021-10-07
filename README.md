@@ -128,6 +128,30 @@ Provides an example of EKS best practices in Infrastructure as Code
 - [x] [EKS Console Read Only Group called eks-console-dashboard-full-access-group](manifests/consoleViewOnlyGroup.yaml)
 - [x] [EBS Encryption of Worker and Bastion Instances](https://aws.github.io/aws-eks-best-practices/security/docs/network/#encryption-in-transit_1)
 
+sam-app details:
+When deploying this project, it will create an API Gateway, a Lambda function and a IAM Role. They are defined in template.yaml.
+
+HelloWorldAPI:
+    Description: "API Gateway endpoint URL for Prod environment for First Function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+HelloWorldFunction:
+    Description: "First Lambda Function ARN"
+    Value: !GetAtt HelloWorldFunction.Arn
+HelloWorldFunctionIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt HelloWorldFunctionRole.Arn
+The Lambda function simply prints out Hello World.
+
+func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+    return events.APIGatewayProxyResponse{
+        Body:       "Tanmoy does not know what he is doing!!!",
+        StatusCode: 200,
+    }, nil
+}
+
+link to test will be in output of cas-app outputs --> HelloWorldAPI link
+
+Pipeline in action
 ![](images/pipleline.JPG)
 
 *_Use of vpc created by stack_
