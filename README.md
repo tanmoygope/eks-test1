@@ -37,7 +37,7 @@ In the new window run the following command to configure kubectl with EKS Cluste
 aws eks update-kubeconfig --name CLUSTER_NAME --region REGION_NAME
 ```
 
-To destroy the cluster run the command below
+To destroy the cluster run the command below [delete the cas-app template from the cloudformation console first before destroying the cluster]
 ```sh
 cdk destroy -c cluster_name=myfirstcluster --all
 ```
