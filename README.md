@@ -128,6 +128,8 @@ Provides an example of EKS best practices in Infrastructure as Code
 - [x] [EKS Console Read Only Group called eks-console-dashboard-full-access-group](manifests/consoleViewOnlyGroup.yaml)
 - [x] [EBS Encryption of Worker and Bastion Instances](https://aws.github.io/aws-eks-best-practices/security/docs/network/#encryption-in-transit_1)
 
+![](images/pipleline.JPG)
+
 *_Use of vpc created by stack_
 ### Advanced Configurations
 
