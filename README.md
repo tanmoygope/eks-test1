@@ -2,6 +2,8 @@
 
 A sample project that deploys an EKS Cluster following a set of best practices with options to install additional addons. Easy deployment of the EBS CSI Driver, EFS CSI Driver, FluentBit Centralized Logging using Cloudwatch, Cluster Autoscaler, ALB Ingress Controller, Secrets CSI Driver and Network Policy Engine. 
 
+sam-app.zip added (sample app to be deployed in the codecommit repo)
+
 ## Pre-requisites
 
 - [x] AWS CDK >= 1.115.0 check [Getting Started with AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html#getting_started_install) to setup your CDK environment. Run `cdk --version` to check the CLI version. 
